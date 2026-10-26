@@ -16,6 +16,8 @@ import java.util.Map;
 final class WallpaperCaptions {
     static final String FILE_NAME = "captions.txt";
     static final int MAX_LENGTH = 80;
+    /** What separates where the picture is from who took it: "Loch Tummel, Scotland - Eric Kilby, CC BY-SA 4.0". */
+    static final String CREDIT = " - ";
 
     private WallpaperCaptions() { }
 

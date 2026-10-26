@@ -5,7 +5,11 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -210,7 +214,7 @@ final class WallpaperPlayer {
     private static TextView makeCaption(Context context, FrameLayout root) {
         float dp = context.getResources().getDisplayMetrics().density;
         TextView text = new TextView(context);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         text.setTextColor(0xD9FFFFFF);
         text.setShadowLayer(6 * dp, 0, dp, 0xCC000000);
         text.setSingleLine(true);
@@ -242,14 +246,24 @@ final class WallpaperPlayer {
         }
         caption.setContentDescription(name);
         if (!fade || caption.getAlpha() == 0f) {
-            caption.setText(name);
+            caption.setText(styled(name));
             caption.setAlpha(1f);
             return;
         }
         caption.animate().alpha(0f).setDuration(250).withEndAction(() -> {
-            caption.setText(name);
+            caption.setText(styled(name));
             caption.animate().alpha(1f).setDuration(350).start();
         }).start();
+    }
+
+    /** Where the picture is, with who took it smaller and dimmer behind it: a credit is a footnote, not the name. */
+    private static CharSequence styled(String name) {
+        int credit = name.indexOf(WallpaperCaptions.CREDIT);
+        if (credit < 0) return name;
+        SpannableString text = new SpannableString(name);
+        text.setSpan(new RelativeSizeSpan(0.78f), credit, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        text.setSpan(new ForegroundColorSpan(0x99FFFFFF), credit, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return text;
     }
 
     /** Names plus sizes: enough to notice a different collection without hashing every image. */
